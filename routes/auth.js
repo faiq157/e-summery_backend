@@ -81,7 +81,7 @@ router.post("/forgotpassword", async (req, res) => {
     await user.save();
 
     // Construct the reset URL (frontend link)
-    const resetUrl = `http://localhost:5173/resetpassword/${resetToken}`;
+    const resetUrl = `https://e-summery.netlify.app/resetpassword/${resetToken}`;
 
     // Set up nodemailer
     const transporter = nodemailer.createTransport({
