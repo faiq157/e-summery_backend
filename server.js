@@ -19,11 +19,12 @@ app.use(express.json());
 // Set up CORS for REST API
 app.use(
   cors({
-    origin: "http://localhost:5173 || https://e-summery.netlify.app",  // Set your frontend's origin here
-    methods: ["GET", "POST"],          // Allow methods (can be extended as needed)
-    credentials: true,                 // Allow credentials (for cookie-based auth)
+    origin: ["http://localhost:5173", "https://e-summery.netlify.app"], // List origins in an array
+    methods: ["GET", "POST"], // Allow HTTP methods
+    credentials: true,        // Allow credentials (e.g., cookies, Authorization headers)
   })
 );
+
 
 // Use your existing routes
 app.use("/api/auth", require("./routes/auth"));
