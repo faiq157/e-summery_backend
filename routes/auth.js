@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -44,7 +45,13 @@ router.post("/login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ msg: "Invalid Credentials" });
-
+ const userInformation = { 
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      role: user.role
+      // Add other fields you want to send to the UI
+    };
     const payload = { user: { id: user.id, role: user.role } };
     jwt.sign(
       payload,
@@ -52,7 +59,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: "5h" },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token,user: userInformation  });
       }
     );
   } catch (err) {
@@ -143,5 +150,9 @@ router.post("/logout", (req, res) => {
   res.clearCookie("token");
   res.status(200).json({ message: "User logged out successfully" });
 });
+
+
+
+
 
 module.exports = router;
