@@ -36,7 +36,7 @@ const server = http.createServer(app);
 // Initialize Socket.IO on top of the server
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",  // Allow Socket.IO connections from your frontend
+    origin:  ["http://localhost:5173", "https://e-summery.netlify.app"],  // Allow Socket.IO connections from your frontend
     methods: ["GET", "POST"],         // Allow methods for Socket.IO
     credentials: true,                // Allow credentials for WebSockets
   },
