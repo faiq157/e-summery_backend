@@ -175,7 +175,7 @@ router.post("/logout", (req, res) => {
  */
 router.put("/edit/:id", async (req, res) => {
   const { id } = req.params;
-  const { fullname, email, password, role } = req.body;
+  const { fullname, email, password, role,department } = req.body;
 
   try {
     // Find the user by ID
@@ -191,6 +191,7 @@ router.put("/edit/:id", async (req, res) => {
     }
     if (password) user.password = await bcrypt.hash(password, 10);
     if (role) user.role = role;
+    if (department) user.department = department;
     await user.save();
     res.status(200).json({ msg: "User updated successfully", user });
   } catch (err) {
