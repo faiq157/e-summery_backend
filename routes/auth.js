@@ -19,7 +19,7 @@ const router = express.Router();
  * @desc Register a new user
  */
 router.post("/register", async (req, res) => {
-  const { fullname, email, password, role } = req.body;
+  const { fullname, email, password, role,department } = req.body;
 
   try {
     if (!role) {
@@ -40,7 +40,7 @@ router.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = new User({ fullname, email, password: hashedPassword, role });
+    const user = new User({ fullname, email, password: hashedPassword, role ,department});
     await user.save();
 
     // Generate a token
@@ -231,6 +231,7 @@ router.get("/users", async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json(users);
+
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: "Server error" });
