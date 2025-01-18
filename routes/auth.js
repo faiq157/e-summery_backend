@@ -238,6 +238,20 @@ router.get("/users", async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+/**
+ * @route GET /roles
+ * @desc Get all unique roles in the system
+ * @access Private (Admin only)
+ */
+router.get("/roles", async (req, res) => {
+  try {
+    const roles = await User.distinct("role");
+    res.status(200).json(roles); 
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
 
 
 module.exports = router;
