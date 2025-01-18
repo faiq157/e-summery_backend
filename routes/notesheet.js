@@ -9,7 +9,7 @@ const authMiddleware = require("../middleware/authMiddleware");
  * Create Notesheet Endpoint
  */
 router.post("/create",authMiddleware, upload.single("image"), async (req, res) => {
-  const { description, subject, userName, email, contact_number } = req.body;
+  const { description, subject, userName, email, contact_number,userEmail } = req.body;
 
   try {
     // Validate required fields
@@ -18,9 +18,6 @@ router.post("/create",authMiddleware, upload.single("image"), async (req, res) =
     }
 
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
     let role = user.role;
 
     // Create notesheet
@@ -30,6 +27,7 @@ router.post("/create",authMiddleware, upload.single("image"), async (req, res) =
       userName,
       email,
       contact_number,
+      userEmail,
       image: req.file ? req.file.path : null,
       currentHandler: role,
        workflow: [
@@ -131,7 +129,6 @@ router.post("/add-comment/:id",authMiddleware, upload.single('document'), async 
     if (!notesheet) {
       return res.status(404).json({ message: "Notesheet not found." });
     }
-console.log(notesheet.currentHandler)
     if (notesheet.currentHandler !== role) {
       return res.status(403).json({ message: "You are not authorized to comment on this notesheet." });
     }
@@ -144,12 +141,11 @@ console.log(notesheet.currentHandler)
 
     // Check for file upload for 'Establishment' role
     const filePath = req.file ? req.file.path : null;  // Get the file path if uploaded
-console.log(filePath)
+
     if (role === 'Establishment' && req.file) {
       if (!filePath) {
         return res.status(400).json({ message: "File is required for the Establishment role." });
       }
-console.log(roleIndex)
       // Add comment with file path for 'Establishment'
       if (roleIndex !== -1) {
         notesheet.roles[roleIndex].comments.push({
@@ -215,5 +211,40 @@ router.get("/notesheets",authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch notesheets.", error: error.message });
   }
 });
+
+/**
+ * Get Comments for a Notesheet Endpoint
+ */
+router.get("/comments/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the notesheet by ID
+    const notesheet = await Notesheet.findById(id);
+
+    if (!notesheet) {
+      return res.status(404).json({ message: "Notesheet not found." });
+    }
+
+    // Extract all comments from the 'roles' array
+    const allComments = notesheet.roles.reduce((comments, role) => {
+      if (role.comments && Array.isArray(role.comments)) {
+        comments.push(...role.comments);
+      }
+      return comments;
+    }, []);
+
+
+    // Return the comments
+    res.status(200).json({
+      message: "Comments fetched successfully.",
+      comments: allComments,
+    });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Failed to fetch comments.", error: error.message });
+  }
+});
+
 
 module.exports = router;
