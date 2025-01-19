@@ -8,8 +8,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 /**
  * Create Notesheet Endpoint
  */
-router.post("/create",authMiddleware, upload.single("image"), async (req, res) => {
-  const { description, subject, userName, email, contact_number,userEmail } = req.body;
+router.post("/create", authMiddleware, upload.single("image"), async (req, res) => {
+  const { description, subject, userName, email, contact_number, userEmail } = req.body;
 
   try {
     // Validate required fields
@@ -30,28 +30,21 @@ router.post("/create",authMiddleware, upload.single("image"), async (req, res) =
       userEmail,
       image: req.file ? req.file.path : null,
       currentHandler: role,
-       workflow: [
-    {
-      role: role,
-      status: "In Progress",
-      forwardedAt: Date.now(),
-    },
-  ],
-  history: [
-    {
-      handler: role,
-      action: "Created Notesheet",
-      timestamp: new Date(),
-    },
-  ],
-  comments: [],
-  roles: [
-    {
-      role: role,
-      status: "In Progress",
-      timestamp: new Date(),
-    },
-  ],
+      status: "New", // Set status to New when created
+      workflow: [
+        {
+          role: role,
+          status: "New", // Role gets the "New" status initially
+          forwardedAt: Date.now(),
+        },
+      ],
+      history: [
+        {
+          role: role,
+          action: "Created Notesheet",
+          timestamp: new Date(),
+        },
+      ],
     });
 
     const savedNoteSheet = await newNoteSheet.save();
@@ -66,41 +59,80 @@ router.post("/create",authMiddleware, upload.single("image"), async (req, res) =
   }
 });
 
+
+
 /**
  * Send Notesheet to Next Role Endpoint
  */
-router.post("/send/:id",authMiddleware, async (req, res) => {
+router.post("/send/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { currentRole, toSendRole } = req.body;
 
   try {
-    // Fetch the notesheet
+    // Fetch the notesheet by ID
     const notesheet = await Notesheet.findById(id);
     if (!notesheet) {
       return res.status(404).json({ message: "Notesheet not found." });
     }
 
-    // Ensure `toSendRole` exists in the workflow or add it dynamically
+    // Ensure the roles and workflow arrays exist
     if (!notesheet.roles) notesheet.roles = [];
-    if (!notesheet.roles.some(r => r.role === toSendRole)) {
+    if (!notesheet.workflow) notesheet.workflow = [];
+
+    // Update the current role's status to "In Progress"
+    const currentRoleIndex = notesheet.roles.findIndex((r) => r.role === currentRole);
+    if (currentRoleIndex !== -1) {
+      notesheet.roles[currentRoleIndex].status = "In Progress";
+      notesheet.roles[currentRoleIndex].forwardedAt = new Date();
+    } else {
       notesheet.roles.push({
-        role: toSendRole,
-        status: "Pending",
-        comments: [],
+        role: currentRole,
+        status: "In Progress",
+        forwardedAt: new Date(),
       });
     }
 
+    // Update workflow: Remove duplicates of the current role and keep the latest data
+    notesheet.workflow = notesheet.workflow.filter((entry) => entry.role !== currentRole);
+    notesheet.workflow.push({
+      role: currentRole,
+      status: "In Progress",
+      forwardedAt: new Date(),
+    });
+
+    // Update the next role's status to "Received"
+    const toSendRoleIndex = notesheet.roles.findIndex((r) => r.role === toSendRole);
+    if (toSendRoleIndex !== -1) {
+      notesheet.roles[toSendRoleIndex].status = "Received";
+    } else {
+      notesheet.roles.push({
+        role: toSendRole,
+        status: "Received",
+        forwardedAt: new Date(),
+      });
+    }
+
+    // Update workflow: Remove duplicates of the toSend role and keep the latest data
+    notesheet.workflow = notesheet.workflow.filter((entry) => entry.role !== toSendRole);
+    notesheet.workflow.push({
+      role: toSendRole,
+      status: "Received",
+      forwardedAt: new Date(),
+    });
+
+    // Update the overall handler
+    notesheet.previousHandler = notesheet.currentHandler; // Track the previous handler
+    notesheet.currentHandler = toSendRole;
+
     // Log the action in history
+    if (!notesheet.history) notesheet.history = [];
     notesheet.history.push({
-      handler: currentRole,
+      role: currentRole,
       action: `Sent to ${toSendRole}`,
       timestamp: new Date(),
     });
 
-    // Update the current handler to the new role
-    notesheet.currentHandler = toSendRole;
-
-    // Save the notesheet
+    // Save the updated notesheet
     const updatedNotesheet = await notesheet.save();
 
     res.status(200).json({
@@ -112,6 +144,7 @@ router.post("/send/:id",authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to send notesheet.", error: error.message });
   }
 });
+
 
 
 
@@ -131,10 +164,6 @@ router.post("/add-comment/:id",authMiddleware, upload.single('document'), async 
     }
     if (notesheet.currentHandler !== role) {
       return res.status(403).json({ message: "You are not authorized to comment on this notesheet." });
-    }
-
-    if (!notesheet.roles || notesheet.roles.length === 0) {
-      return res.status(404).json({ message: "No roles assigned in notesheet." });
     }
 
     const roleIndex = notesheet.roles.findIndex(r => r.role === role);
@@ -157,7 +186,7 @@ router.post("/add-comment/:id",authMiddleware, upload.single('document'), async 
       } else {
         notesheet.roles.push({
           role: role,
-          status: "Pending", // Or any default status
+          status: "New", // Or any default status
           comments: [{
             user: role,
             comment,
@@ -177,7 +206,7 @@ router.post("/add-comment/:id",authMiddleware, upload.single('document'), async 
       } else {
         notesheet.roles.push({
           role: role,
-          status: "Pending", // Or any default status
+          status: "New", // Or any default status
           comments: [{
             user: role,
             comment,
@@ -203,14 +232,34 @@ router.post("/add-comment/:id",authMiddleware, upload.single('document'), async 
 /**
  * Get All Notesheets
  */
-router.get("/notesheets",authMiddleware, async (req, res) => {
+router.get("/notesheets", authMiddleware, async (req, res) => {
+  const { role, status } = req.query; // Retrieve role and status from query parameters
+
   try {
-    const notesheets = await Notesheet.find();
+    // Validate role and status parameters
+    if (!role || !status) {
+      return res.status(400).json({ message: "Both role and status are required." });
+    }
+
+    // Filter notesheets based on role and status in the workflow
+    const notesheets = await Notesheet.find({
+      workflow: {
+        $elemMatch: {
+          role: role,       // Match the role in the workflow
+          status: status,   // Match the status in the workflow
+        },
+      },
+    });
+
+    // Return the filtered notesheets
     res.status(200).json(notesheets);
   } catch (error) {
+    console.error("Error fetching notesheets:", error);
     res.status(500).json({ message: "Failed to fetch notesheets.", error: error.message });
   }
 });
+
+
 
 /**
  * Get Comments for a Notesheet Endpoint
@@ -245,6 +294,72 @@ router.get("/comments/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch comments.", error: error.message });
   }
 });
+
+/**
+ * Edit Notesheet Endpoint
+ */
+router.put("/edit/:id", authMiddleware, upload.single("image"), async (req, res) => {
+  const { id } = req.params;
+  const { description, subject, userName, email, contact_number, userEmail } = req.body;
+
+  try {
+    const notesheet = await Notesheet.findById(id);
+    if (!notesheet) {
+      return res.status(404).json({ message: "Notesheet not found." });
+    }
+
+    // Update the fields with new values
+    notesheet.description = description || notesheet.description;
+    notesheet.subject = subject || notesheet.subject;
+    notesheet.userName = userName || notesheet.userName;
+    notesheet.email = email || notesheet.email;
+    notesheet.contact_number = contact_number || notesheet.contact_number;
+    notesheet.userEmail = userEmail || notesheet.userEmail;
+    notesheet.image = req.file ? req.file.path : notesheet.image;
+
+    // Log the action in history
+    if (!notesheet.history) notesheet.history = [];
+    notesheet.history.push({
+      role: req.user.role,
+      action: `Updated Notesheet with ID: ${id}`,
+      timestamp: new Date(),
+    });
+
+    // Save the updated notesheet
+    const updatedNotesheet = await notesheet.save();
+
+    res.status(200).json({
+      message: "Notesheet updated successfully.",
+      data: updatedNotesheet,
+    });
+  } catch (error) {
+    console.error("Error updating notesheet:", error);
+    res.status(500).json({ message: "Failed to update notesheet.", error: error.message });
+  }
+});
+
+/**
+ * Delete Notesheet Endpoint
+ */
+router.delete('/delete/:id', async (req, res) => {
+    const notesheetId = req.params.id;
+
+    try {
+        // Find and delete the notesheet by ID
+        const result = await Notesheet.findByIdAndDelete(notesheetId);
+
+        if (!result) {
+            return res.status(404).json({ message: "Notesheet not found" });
+        }
+
+        return res.status(200).json({ message: "Notesheet deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
+
+
 
 
 module.exports = router;
