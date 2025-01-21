@@ -22,13 +22,10 @@ app.use(
   })
 );
 
-// Use your existing routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/notesheet", require("./routes/notesheet"));
-
-// Create HTTP server
+app.use("/api",require("./routes/saveToken"));
+app.use("/api",require("./routes/sendNotifications"))
 const server = http.createServer(app);
-
-// Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
