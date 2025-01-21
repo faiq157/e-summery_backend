@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const NotificationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true, // Ensures each notification is linked to a specific user
-    ref: 'User', // Reference to the 'User' model
+    required: true, 
+    ref: 'User', 
   },
   title: {
     type: String,
@@ -14,6 +14,9 @@ const NotificationSchema = new mongoose.Schema({
   body: {
     type: String,
     required: true,
+  },
+  link:{
+    type:String
   },
   status: {
     type: String,

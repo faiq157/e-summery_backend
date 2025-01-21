@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Route to send notification and store in database
 router.post('/send-notification', async (req, res) => {
-  const { title, body, userId } = req.body;
+  const { title, body, userId,link } = req.body;
 
   if (!title || !body || !userId) {
     return res.status(400).json({ message: "Title, body, and userId are required" });
@@ -29,6 +29,7 @@ router.post('/send-notification', async (req, res) => {
       notification: {
         title,
         body,
+        link,
       },
       token: fcmToken, // The token of the specific user
     };
@@ -41,6 +42,7 @@ router.post('/send-notification', async (req, res) => {
       userId,
       title,
       body,
+      link,
       status: 'sent', // Notification sent successfully
     });
 
@@ -56,6 +58,7 @@ router.post('/send-notification', async (req, res) => {
       userId,
       title,
       body,
+      link,
       status: 'failed', // Notification failed
     });
 
