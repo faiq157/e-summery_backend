@@ -4,7 +4,10 @@ const Notesheet = require("../models/NotesheetSchema");
 const User = require("../models/User");
 const upload = require("./../config/multerConfig");
 const authMiddleware = require("../middleware/authMiddleware");
+const fs = require("fs");
 
+const s3 = require("../config/cloudfareConfig");
+const BUCKET_NAME = "notesheets";
 /**
  * Create Notesheet Endpoint
  */
@@ -20,6 +23,36 @@ router.post("/create", authMiddleware, upload.single("image"), async (req, res) 
     const user = await User.findOne({ email });
     let role = user.role;
 
+    let imageUrl = null;
+
+    // If an image is uploaded, upload it to Cloudflare R2
+    if (req.file) {
+      const fileContent = fs.readFileSync(req.file.path); // Read the file content as a buffer
+      const fileName = `notesheets/${Date.now()}_${req.file.originalname}`; // Use a unique name for the file
+
+      // Upload to Cloudflare R2
+      const params = {
+        Bucket: BUCKET_NAME,
+        Key: fileName,
+        Body: fileContent,
+        ContentType: req.file.mimetype, // Content type of the file (e.g., image/jpeg)
+      };
+
+      // Upload the file
+      await s3.upload(params).promise();
+
+      // Generate a pre-signed URL for accessing the file
+      const signedUrlParams = {
+        Bucket: BUCKET_NAME,
+        Key: fileName,
+        Expires: 3600, // URL expires in 1 hour
+      };
+      imageUrl = s3.getSignedUrl("getObject", signedUrlParams);
+
+      // Delete the temporary file after uploading
+      fs.unlinkSync(req.file.path);
+    }
+
     // Create notesheet
     const newNoteSheet = new Notesheet({
       description,
@@ -28,7 +61,7 @@ router.post("/create", authMiddleware, upload.single("image"), async (req, res) 
       email,
       contact_number,
       userEmail,
-      image: req.file ? req.file.path : null,
+      image: imageUrl, // Store the pre-signed URL in the database
       currentHandler: role,
       status: "New", // Set status to New when created
       workflow: [
