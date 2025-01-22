@@ -7,6 +7,7 @@ const notesheetSchema = new mongoose.Schema({
   email: { type: String, required: true },
   userEmail: { type: String, required: true },
   contact_number: { type: String, required: true },
+  trackingId: { type: String, unique: true },
   image: { type: String }, // For storing image path if any
   currentHandler: { type: String, required: true }, // Current handler
   previousHandler: { type: String }, // Previous handler

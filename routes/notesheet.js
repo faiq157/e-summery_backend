@@ -5,6 +5,7 @@ const User = require("../models/User");
 const upload = require("./../config/multerConfig");
 const authMiddleware = require("../middleware/authMiddleware");
 const fs = require("fs");
+const { v4: uuidv4 } = require("uuid");
 
 const s3 = require("../config/cloudfareConfig");
 const BUCKET_NAME = "notesheets";
@@ -45,14 +46,13 @@ router.post("/create", authMiddleware, upload.single("image"), async (req, res) 
       const signedUrlParams = {
         Bucket: BUCKET_NAME,
         Key: fileName,
-        Expires: 3600, // URL expires in 1 hour
       };
       imageUrl = s3.getSignedUrl("getObject", signedUrlParams);
 
       // Delete the temporary file after uploading
       fs.unlinkSync(req.file.path);
     }
-
+    const trackingId = uuidv4();
     // Create notesheet
     const newNoteSheet = new Notesheet({
       description,
@@ -63,6 +63,7 @@ router.post("/create", authMiddleware, upload.single("image"), async (req, res) 
       userEmail,
       image: imageUrl, // Store the pre-signed URL in the database
       currentHandler: role,
+      trackingId,
       status: "New", // Set status to New when created
       workflow: [
         {
