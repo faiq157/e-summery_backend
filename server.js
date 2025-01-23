@@ -27,6 +27,7 @@ app.use("/api/notesheet", require("./routes/notesheet"));
 app.use("/api",require("./routes/saveToken"));
 app.use("/api",require("./routes/sendNotifications"));
 app.use("/api",require("./routes/tracking"))
+app.use("/api",require("./routes/AssignRole"))
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
