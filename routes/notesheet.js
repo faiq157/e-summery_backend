@@ -301,16 +301,20 @@ router.post("/add-comment/:id", authMiddleware, upload.single("document"), async
 
 
 /**
- * Get All Notesheets
+ * Get All Notesheets with Pagination
  */
 router.get("/notesheets", authMiddleware, async (req, res) => {
-  const { role, status } = req.query; // Retrieve role and status from query parameters
+  const { role, status, page , limit } = req.query; // Retrieve role, status, page, and limit from query parameters
 
   try {
     // Validate role and status parameters
-    if (!role || !status) {
+    if (!role || !status || !page || !limit ) {
       return res.status(400).json({ message: "Both role and status are required." });
     }
+
+    // Convert page and limit to integers
+    const pageNumber = parseInt(page);
+    const pageLimit = parseInt(limit);
 
     // Filter notesheets based on role and status in the workflow
     const notesheets = await Notesheet.find({
@@ -320,15 +324,39 @@ router.get("/notesheets", authMiddleware, async (req, res) => {
           status: status,   // Match the status in the workflow
         },
       },
+    })
+      .skip((pageNumber - 1) * pageLimit)  // Skip items based on current page
+      .limit(pageLimit);                    // Limit the number of results per page
+
+    // Get the total number of notesheets for pagination metadata
+    const totalNotesheets = await Notesheet.countDocuments({
+      workflow: {
+        $elemMatch: {
+          role: role,       // Match the role in the workflow
+          status: status,   // Match the status in the workflow
+        },
+      },
     });
 
-    // Return the filtered notesheets
-    res.status(200).json(notesheets);
+    // Calculate the total number of pages
+    const totalPages = Math.ceil(totalNotesheets / pageLimit);
+
+    // Return the paginated notesheets and pagination metadata
+    res.status(200).json({
+      notesheets,
+      pagination: {
+        totalNotesheets,
+        totalPages,
+        currentPage: pageNumber,
+        pageLimit,
+      },
+    });
   } catch (error) {
     console.error("Error fetching notesheets:", error);
     res.status(500).json({ message: "Failed to fetch notesheets.", error: error.message });
   }
 });
+
 
 
 
