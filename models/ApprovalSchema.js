@@ -16,6 +16,10 @@ const ApprovalSchema = new mongoose.Schema(
       ref: "User", // Reference to the User model
       default: [], // Default is an empty array
     },
+    sended:{
+      type:Boolean,
+      default:false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
