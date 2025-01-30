@@ -2,7 +2,6 @@ const PushNotificationToken = require("../models/PushNotificationToken");
 const express = require("express");
 const router = express.Router();
 
-// Endpoint to save device token
 router.post('/save-token', async (req, res) => {
   const { token, userId } = req.body;
   console.log("Received token:", token, userId);

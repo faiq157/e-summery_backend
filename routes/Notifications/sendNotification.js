@@ -1,6 +1,6 @@
-const PushNotificationToken = require("../models/PushNotificationToken");
-const Notification = require("../models/NotificationSchema");
-const admin = require("../config/firebaseConfig"); // Assuming you have configured Firebase Admin SDK
+const PushNotificationToken = require("../../models/PushNotificationToken");
+const Notification = require("../../models/NotificationSchema");
+const admin = require("../../config/firebaseConfig"); // Assuming you have configured Firebase Admin SDK
 const express = require("express");
 const router = express.Router();
 
@@ -69,49 +69,4 @@ router.post('/send-notification', async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
-
-router.get('/get-notifications/:userId', async (req, res) => {
-  const { userId } = req.params; // Extract userId from the URL parameter
-
-  try {
-    // Find notifications for the given userId
-    const notifications = await Notification.find({ userId });
-
-    // If no notifications are found, return a 404 response
-    if (notifications.length === 0) {
-      return res.status(404).json({ message: "No notifications found for this user" });
-    }
-
-    // Return the notifications found
-    res.status(200).json({ notifications });
-  } catch (error) {
-    console.error("Error retrieving notifications:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-router.delete('/delete-notifications/:userId', async (req, res) => {
-  const { userId } = req.params; // Extract userId from the URL parameter
-
-  try {
-    // Delete all notifications for the given userId
-    const result = await Notification.deleteMany({ userId });
-
-    // If no notifications were deleted, return a 404 response
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "No notifications found to delete for this user" });
-    }
-
-    // Return a success response with the count of deleted notifications
-    res.status(200).json({
-      message: "All notifications deleted successfully",
-      deletedCount: result.deletedCount,
-    });
-  } catch (error) {
-    console.error("Error deleting notifications:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-
-module.exports = router;
+module.exports = router

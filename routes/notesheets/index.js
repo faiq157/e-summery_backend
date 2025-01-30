@@ -1,0 +1,20 @@
+const express = require("express");
+const router = express.Router();
+const createRoute = require("./CreateNotesheet");
+const completeRoute = require("./CompleteNotesheet");
+const sendRoute = require("./SendNotesheet");
+const addCommentRoute = require("./AddCommentNotesheet");
+const getRoute = require("./GetNotesheet");
+const commentsRoute = require("./GetCommentsNotesheet");
+const editRoute = require("./EditeNotesheet");
+const deleteRoute = require("./DeleteNotesheet");
+router.use("/create", createRoute);
+router.use("/complete", completeRoute);
+router.use("/send", sendRoute);
+router.use("/add-comment", addCommentRoute);
+router.use("/notesheets", getRoute);
+router.use("/comments", commentsRoute);
+router.use("/edit", editRoute);
+router.use("/delete", deleteRoute);
+
+module.exports = router;
