@@ -304,26 +304,74 @@ router.post("/add-comment/:id", authMiddleware, upload.single("document"), async
  * Get All Notesheets with Pagination
  */
 router.get("/notesheets", authMiddleware, async (req, res) => {
-  const { role, status, page , limit } = req.query; // Retrieve role, status, page, and limit from query parameters
+  const { role, status, page, limit, dateRange, search } = req.query; 
 
   try {
-    // Validate role and status parameters
-    if (!role || !status || !page || !limit ) {
-      return res.status(400).json({ message: "Both role and status are required." });
+    // Validate required parameters
+    if (!role || !status || !page || !limit) {
+      return res.status(400).json({ message: "Role, status, page, and limit are required." });
     }
 
     // Convert page and limit to integers
     const pageNumber = parseInt(page);
     const pageLimit = parseInt(limit);
 
-    // Filter notesheets based on role and status in the workflow
+    // Initialize the date filter
+    let dateFilter = {};
+
+    if (dateRange) {
+      const now = new Date();
+      let startDate = new Date();
+
+      switch (dateRange) {
+        case "all":
+          startDate = new Date(0); // Start of Unix epoch
+    break;
+        case "today":
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "last_week":
+          startDate.setDate(now.getDate() - 7);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "last_15_days":
+          startDate.setDate(now.getDate() - 15);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case "last_month":
+          startDate.setMonth(now.getMonth() - 1);
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid date range" });
+      }
+
+      dateFilter = { "timestamps.createdAt": { $gte: startDate } };
+    }
+
+    // Initialize the search filter for subject and userName
+    let searchFilter = {};
+    if (search) {
+      const searchQuery = new RegExp(search, 'i'); // 'i' makes it case-insensitive
+
+      searchFilter = {
+        $or: [
+          { subject: { $regex: searchQuery } }, // Match subject field
+          { userName: { $regex: searchQuery } } // Match userName field
+        ]
+      };
+    }
+
+    // Filter notesheets based on role, status in the workflow, date range, and search
     const notesheets = await Notesheet.find({
       workflow: {
         $elemMatch: {
-          role: role,       // Match the role in the workflow
-          status: status,   // Match the status in the workflow
+          role: role,
+          status: status,
         },
       },
+      ...dateFilter, // Include the date filter in the query
+      ...searchFilter, // Include the search filter in the query
     })
       .skip((pageNumber - 1) * pageLimit)  // Skip items based on current page
       .limit(pageLimit);                    // Limit the number of results per page
@@ -332,10 +380,12 @@ router.get("/notesheets", authMiddleware, async (req, res) => {
     const totalNotesheets = await Notesheet.countDocuments({
       workflow: {
         $elemMatch: {
-          role: role,       // Match the role in the workflow
-          status: status,   // Match the status in the workflow
+          role: role,
+          status: status,
         },
       },
+      ...dateFilter, // Include the date filter for the count
+      ...searchFilter, // Include the search filter for the count
     });
 
     // Calculate the total number of pages
@@ -356,6 +406,8 @@ router.get("/notesheets", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch notesheets.", error: error.message });
   }
 });
+
+
 
 
 
