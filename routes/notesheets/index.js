@@ -8,6 +8,7 @@ const getRoute = require("./GetNotesheet");
 const commentsRoute = require("./GetCommentsNotesheet");
 const editRoute = require("./EditeNotesheet");
 const deleteRoute = require("./DeleteNotesheet");
+const statusCountRoute = require("./DashboardCount")
 router.use("/create", createRoute);
 router.use("/complete", completeRoute);
 router.use("/send", sendRoute);
@@ -16,5 +17,6 @@ router.use("/notesheets", getRoute);
 router.use("/comments", commentsRoute);
 router.use("/edit", editRoute);
 router.use("/delete", deleteRoute);
+router.use("/statuscount",statusCountRoute)
 
 module.exports = router;
