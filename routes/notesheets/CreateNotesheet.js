@@ -47,8 +47,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
         return res.status(500).json({ message: "Failed to upload image.", error: uploadError.message });
       }
     }
-
-  const trackingId = uuidv4().substring(0, 15);
+  const trackingId = uuidv4().replace(/-/g, "").substring(0, 8);
     const newNoteSheet = new Notesheet({
       description,
       subject,
