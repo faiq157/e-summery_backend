@@ -22,8 +22,7 @@ router.post("/", upload.single("pdf"), async (req, res) => {
 
     // Upload PDF to S3 bucket
     const fileContent = fs.readFileSync(req.file.path);
-    const fileName = `pdfs/${Date.now()}_${req.file.originalname}`;
-
+    const fileName = `pdfs/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
     const params = {
       Bucket: BUCKET_NAME,
       Key: fileName,

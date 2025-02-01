@@ -1,8 +1,8 @@
 
 const express = require("express");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const User = require("../../models/User");
+const { sendEmail } = require("../../utils/email");
 
 
 const router = express.Router();
@@ -22,25 +22,15 @@ router.post("/", async (req, res) => {
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
-
-    // Send email
-    const transporter = nodemailer.createTransport({
-      service: "Gmail",
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
-    const resetUrl = `https://e-summery.netlify.app/resetpassword/${resetToken}`;
+  const resetUrl = `https://e-summery.netlify.app/resetpassword/${resetToken}`;
     const mailOptions = {
       to: email,
       from: process.env.EMAIL,
       subject: "Password Reset",
       text: `Click the link to reset your password: ${resetUrl}`,
     };
+    await sendEmail(mailOptions);
 
-    await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "Password reset link sent to email" });
   } catch (err) {
     console.error(err.message);

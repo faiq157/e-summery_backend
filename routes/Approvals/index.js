@@ -8,11 +8,16 @@ const GetApprovalIdsRoute = require("./GetApprovalIDs");
 const GetApprovalRoute = require("./GetApprovals");
 const GetApprovalUser = require("./GetApprovalUser");
 const SendApproval = require("./SendApproval");
+const SendApprovalOther = require("./SendApprovalOthers");
+
 router.use("/approval", CreateRoute);
 router.use("/approval", DeleteRoute);
 router.use("/approvals", GetApprovalIdsRoute);
 router.use("/approvals", GetApprovalRoute);
 router.use("/approvals/user", GetApprovalUser);
 router.use("/approval/send", SendApproval);
+router.use("/approval/send-other", SendApprovalOther);
+
+
 
 module.exports = router;
