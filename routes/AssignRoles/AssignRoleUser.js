@@ -1,16 +1,20 @@
 const Role = require('../../models/RoleSchema');
 const express = require('express');
 const router = express.Router();
+
 router.post('/', async (req, res) => {
-    const { role, selectedRole } = req.body;
+    const { role, selectedRole, email } = req.body;
+
+    if (!role ) {
+        return res.status(400).json({ message: "Role and email are required" });
+    }
 
     try {
-        // Check if the role already exists in the database
         const existingRole = await Role.findOne({ role });
 
         if (existingRole) {
-            // If the role already exists, update the selectedRole array
             existingRole.selectedRole = selectedRole;
+            existingRole.email = email; 
 
             await existingRole.save();
             return res.status(200).json({ message: 'Role updated successfully', data: existingRole });
@@ -19,7 +23,8 @@ router.post('/', async (req, res) => {
         // If the role doesn't exist, create a new role entry
         const newRole = new Role({
             role,
-            selectedRole
+            selectedRole,
+            email 
         });
 
         await newRole.save();
@@ -30,4 +35,4 @@ router.post('/', async (req, res) => {
     }
 });
 
-module.exports = router
+module.exports = router;

@@ -8,10 +8,10 @@ const router = express.Router();
  * @desc Send an approval email with the provided tracking ID
  */
 router.post("/", async (req, res) => {
-  const { email, trackingId } = req.body;
+  const { email, trackingId,subject,text } = req.body;
 
   // Validate required fields
-  if (!email || !trackingId) {
+  if (!email ) {
     return res
       .status(400)
       .json({ message: "Email and Tracking ID are required" });
@@ -22,8 +22,8 @@ router.post("/", async (req, res) => {
     const mailOptions = {
       to: email,
       from: process.env.EMAIL,
-      subject: "NoteSheet Tracking ID",
-      text: `Your tracking ID is: ${trackingId}. Please use this tracking ID for further processing. Click on the URL ${`https://e-summery.netlify.app/tracking ` }`,
+      subject: subject,
+      text: text,
     };
 
     // Send the email using the utility function
