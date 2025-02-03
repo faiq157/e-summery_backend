@@ -3,7 +3,7 @@ const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
 const Notesheet = require("../models/NotesheetSchema");
 const router = express.Router();
-router.get("/track/:trackingId",authMiddleware, async (req, res) => {
+router.get("/track/:trackingId", async (req, res) => {
   const { trackingId } = req.params;
 
   try {
