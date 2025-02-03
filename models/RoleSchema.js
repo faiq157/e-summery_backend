@@ -1,4 +1,5 @@
 // models/Role.js
+const e = require('express');
 const mongoose = require('mongoose');
 
 // Schema for selectedRole
@@ -10,7 +11,11 @@ const selectedRoleSchema = new mongoose.Schema({
     role: {
         type: String,
         required: true,
-    }
+    },
+    email: {
+        type: String,
+        required: true,
+    },
 });
 
 // Schema for the main role
@@ -19,7 +24,7 @@ const roleSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    selectedRole: [selectedRoleSchema], // Array of selectedRole objects
+    selectedRole: [selectedRoleSchema], 
 });
 
 // Create the model from the schema

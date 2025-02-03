@@ -29,9 +29,11 @@ router.post('/', async (req, res) => {
       notification: {
         title,
         body,
-        link,
       },
-      token: fcmToken, // The token of the specific user
+        data: {
+    link, 
+  },
+      token: fcmToken, 
     };
 
     // Send notification to the specific user using Firebase Admin SDK (send instead of sendEachForMulticast)
@@ -41,9 +43,11 @@ router.post('/', async (req, res) => {
     const newNotification = new Notification({
       userId,
       title,
-      body,
-      link,
-      status: 'sent', // Notification sent successfully
+      body, 
+       data: {
+    link, 
+  },
+      status: 'sent', 
     });
 
     // Save the notification to the database
