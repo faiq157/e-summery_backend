@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 // Route to send notification and store in database
-router.post('/send-notification', async (req, res) => {
+router.post('/', async (req, res) => {
   const { title, body, userId,link } = req.body;
 
   if (!title || !body || !userId) {

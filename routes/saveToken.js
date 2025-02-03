@@ -11,17 +11,6 @@ router.post('/save-token', async (req, res) => {
   }
 
   try {
-    // Check if the userId already exists in the database
-    let existingEntry = await PushNotificationToken.findOne({ userId });
-
-    if (existingEntry) {
-      // Update the token for the existing userId
-      existingEntry.token = token;
-      await existingEntry.save();
-      return res.status(200).json({ message: "Token updated successfully" });
-    }
-
-    // Create a new entry if userId does not exist
     const newToken = new PushNotificationToken({ token, userId });
     await newToken.save();
 
