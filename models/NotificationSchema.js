@@ -27,6 +27,9 @@ const NotificationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically sets the timestamp when the notification is created
   },
+  isRead:{
+    type:Boolean
+  }
 });
 
 const Notification = mongoose.model('Notification', NotificationSchema);
