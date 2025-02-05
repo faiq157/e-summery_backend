@@ -48,6 +48,7 @@ router.post('/', async (req, res) => {
     link, 
   },
       status: 'sent', 
+      isRead: false,
     });
 
     // Save the notification to the database
@@ -64,6 +65,7 @@ router.post('/', async (req, res) => {
       body,
       link,
       status: 'failed', // Notification failed
+      isRead: false,
     });
 
     // Save the failed notification to the database
