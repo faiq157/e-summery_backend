@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const notesheetSchema = new mongoose.Schema({
-  description: { type: String, required: true },
+  description: { type: String, },
   subject: { type: String, required: true },
   userName: { type: String, required: true },
   email: { type: String, required: true },
