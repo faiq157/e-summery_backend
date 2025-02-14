@@ -16,7 +16,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   const { description, subject, userName, email, contact_number, userEmail } = req.body;
  
   try {
-    if (!description || !subject || !userName || !email || !contact_number) {
+    if ( !subject || !userName || !email || !contact_number) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
