@@ -28,6 +28,7 @@ const notesheetSchema = new mongoose.Schema({
       action: { type: String }, // Action performed (e.g., "Created Notesheet")
       timestamp: { type: Date, default: Date.now },
       comment: { type: String }, // Optional comment for this action
+      timeliness: { type: String, default: "N/A" }, 
     },
   ],
   roles: [
