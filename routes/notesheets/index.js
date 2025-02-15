@@ -10,6 +10,7 @@ const editRoute = require("./EditeNotesheet");
 const deleteRoute = require("./DeleteNotesheet");
 const statusCountRoute = require("./DashboardCount");
 const sendTrackingIdRoute = require("./SendTrackingId");
+const timelineRoute=require('./timeline-count')
 
 router.use("/create", createRoute);
 router.use("/complete", completeRoute);
@@ -21,6 +22,7 @@ router.use("/edit", editRoute);
 router.use("/delete", deleteRoute);
 router.use("/statuscount",statusCountRoute);
 router.use("/send-tracking-id", sendTrackingIdRoute);
+router.use("/timeliness-count",timelineRoute)
 
 
 module.exports = router;

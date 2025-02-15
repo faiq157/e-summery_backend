@@ -63,12 +63,28 @@ router.post("/:id", authMiddleware, async (req, res) => {
     notesheet.previousHandler = notesheet.currentHandler; // Track the previous handler
     notesheet.currentHandler = toSendRole;
 
-    // Log the action in history
+    // Log the action in history with timeliness check
     if (!notesheet.history) notesheet.history = [];
+
+    // Determine timeliness
+    let timeliness = "N/A"; // Default value for the first entry
+    if (notesheet.history.length > 0) {
+      const lastHistory = notesheet.history[notesheet.history.length - 1];
+      const currentTimestamp = new Date();
+      const previousTimestamp = new Date(lastHistory.timestamp);
+
+      const timeDifference = currentTimestamp - previousTimestamp;
+      const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
+
+      // Check if it's timely or delayed
+      timeliness = timeDifference <= oneDay ? "Timely" : "Delayed";
+    }
+
     notesheet.history.push({
       role: currentRole,
       action: `Sent to ${toSendRole}`,
       timestamp: new Date(),
+      timeliness, // Add timeliness status
     });
 
     // Save the updated notesheet
