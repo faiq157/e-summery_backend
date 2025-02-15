@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Notesheet = require("../../models/NotesheetSchema");
-
 const authMiddleware = require("../../middleware/authMiddleware");
+
 router.get("/", authMiddleware, async (req, res) => {
   const { role, status, page, limit, dateRange, search } = req.query; 
 
@@ -26,7 +26,7 @@ router.get("/", authMiddleware, async (req, res) => {
       switch (dateRange) {
         case "all":
           startDate = new Date(0); 
-    break;
+          break;
         case "today":
           startDate.setHours(0, 0, 0, 0);
           break;
@@ -73,6 +73,7 @@ router.get("/", authMiddleware, async (req, res) => {
       ...dateFilter, // Include the date filter in the query
       ...searchFilter, // Include the search filter in the query
     })
+      .sort({ "timestamps.createdAt": -1 }) // Sort by createdAt in descending order
       .skip((pageNumber - 1) * pageLimit)  // Skip items based on current page
       .limit(pageLimit);                    // Limit the number of results per page
 
@@ -107,4 +108,4 @@ router.get("/", authMiddleware, async (req, res) => {
   }
 });
 
-module.exports=router;
+module.exports = router;

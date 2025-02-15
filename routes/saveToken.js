@@ -4,8 +4,6 @@ const router = express.Router();
 
 router.post('/save-token', async (req, res) => {
   const { token, userId } = req.body;
-  console.log("Received token:", token, userId);
-
   if (!token || !userId) {
     return res.status(400).json({ message: "Token and userId are required" });
   }
