@@ -4,6 +4,7 @@ const Notesheet = require("../../models/NotesheetSchema");
 
 router.delete('/:id', async (req, res) => {
     const notesheetId = req.params.id;
+    console.log(notesheetId)
 
     try {
         // Find and delete the notesheet by ID

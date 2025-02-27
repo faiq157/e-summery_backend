@@ -10,8 +10,8 @@ const UserSchema = new mongoose.Schema({
   department: { type: String , required: true},
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
-  otp: { type: String }, 
-  otpExpiry: { type: Date },
+  // otp: { type: String }, 
+  // otpExpiry: { type: Date },
 },{ timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);
