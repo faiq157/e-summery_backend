@@ -11,7 +11,7 @@ const editUserRoute = require("./EditUser");
 const deleteUserRoute = require("./DeleteUser");
 const getUsersRoute = require("./GetUsers");
 const getRolesRoute = require("./GetRoles");
-const verifyRoute=require('./verify-otp')
+
 
 // Define routes and their prefixes
 router.use("/register", registerRoute);
@@ -23,6 +23,5 @@ router.use("/edit", editUserRoute);
 router.use("/delete", deleteUserRoute);
 router.use("/users", getUsersRoute);
 router.use("/roles", getRolesRoute);
-router.use('/verify-otp',verifyRoute)
 
 module.exports = router;
