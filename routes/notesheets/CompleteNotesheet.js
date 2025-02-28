@@ -26,7 +26,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
     // Add an entry in the history
     notesheet.history.push({
       role: "Establishment", // Replace with the actual role
-      action: "Updated all workflow statuses and Notesheet status to Completed",
+      action: "Notesheet Completed",
       timestamp: new Date(),
     });
 
