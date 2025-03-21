@@ -21,6 +21,7 @@ router.post("/", async (req, res) => {
     // Update the sentTo field in the database
     approval.sentTo = updatedSentTo;
     approval.sended = true;
+    approval.status = "received";
     const updatedApproval = await approval.save();
 
     // Logic to send approval to multiple users (e.g., email or notification)

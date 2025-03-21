@@ -23,9 +23,11 @@ router.get("/:id", async (req, res) => {
         bodyText: approval.bodyText,
         sentTo: approval.sentTo,
         sended: approval.sended,
+        status: approval.status,
         _id: approval._id,
         createdAt: approval.createdAt,
         updatedAt: approval.updatedAt,
+
         __v: approval.__v
       })),
     });
