@@ -15,15 +15,6 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ message: "Approval not found." });
     }
 
-    // Delete from S3 bucket
-    const fileName = approval.pdfUrl.split("/").pop();
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: `pdfs/${fileName}`,
-    };
-
-    await s3.deleteObject(params).promise();
-
     // Delete from MongoDB
     await approvalSchema.findByIdAndDelete(id);
 

@@ -10,41 +10,32 @@ const BUCKET_NAME = "notesheets";
 const R2_PUBLIC_URL = "https://pub-df4b0b355e6f47b294e478e797b911da.r2.dev";
 
 // Route for uploading a new approval (existing)
-router.post("/", upload.single("pdf"), async (req, res) => {
-  const { title } = req.body;
+router.post("/", async (req, res) => {
+  const { title,registrarOffice,phoneFax,email,refNo,date,bodyText } = req.body;
 
   try {
-    if (!title || !req.file) {
-      return res.status(400).json({ message: "Title and PDF file are required." });
+    if (!title || !registrarOffice || !phoneFax || !email || !refNo ||!date ||!bodyText) {
+      return res.status(400).json({ message: "All Field are required." });
     }
 
-    const user = req.user; // Assuming `authMiddleware` adds the authenticated user to `req.user`.
-
-    // Upload PDF to S3 bucket
-    const fileContent = fs.readFileSync(req.file.path);
-    const fileName = `pdfs/${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: fileName,
-      Body: fileContent,
-      ContentType: req.file.mimetype,
-    };
-
-    await s3.upload(params).promise();
-    const pdfUrl = `${R2_PUBLIC_URL}/${fileName}`;
 
     // Save to MongoDB
-    const newPDF = new approvalSchema({
+    const NewApproval = new approvalSchema({
       title,
-      pdfUrl,
+      registrarOffice,
+      phoneFax,
+      email,
+      refNo,
+      date,
+      bodyText
     });
 
-    const savedPDF = await newPDF.save();
+    const savedApproval = await NewApproval.save();
 
     // Respond with the saved entry
     res.status(201).json({
-      message: "PDF uploaded successfully.",
-      data: savedPDF,
+      message: "Approval Draft Created successfully.",
+      data: savedApproval,
     });
   } catch (error) {
     console.error("Error uploading PDF:", error);
