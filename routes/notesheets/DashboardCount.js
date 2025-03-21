@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
       return res.status(400).json({ error: "Role is required as a query parameter" });
     }
 
-    console.log("Fetching status count for role:", role);
+    // console.log("Fetching status count for role:", role);
     
     // Define date ranges based on the filter
     let startDate;
@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
       "timestamps.createdAt": { $gte: startDate.toDate() },
     });
 
-    console.log("Total notesheets fetched:", notesheets.length);
+    // console.log("Total notesheets fetched:", notesheets.length);
 
     // Initialize status counters
     const statusCount = {
@@ -58,7 +58,7 @@ router.get("/", async (req, res) => {
       });
     });
 
-    console.log("Final status count:", statusCount);
+    // console.log("Final status count:", statusCount);
 
     res.json({ role, filter, statusCount });
   } catch (error) {

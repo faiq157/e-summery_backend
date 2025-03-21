@@ -4,12 +4,31 @@ const ApprovalSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
       trim: true,
     },
-    pdfUrl: {
+    registrarOffice: {
       type: String,
-      required: true,
+      required: false,
+    },
+    phoneFax: {
+      type: String,
+      required: false,
+    },
+    email: {
+      type: String,
+      required: false,
+    },
+    refNo: {
+      type: String,
+      required: false,
+    },
+    date: {
+      type: String,
+      required: false,
+    },
+    bodyText: {
+      type: String,
+      required: false,
     },
       sentTo: {
       type: [mongoose.Schema.Types.ObjectId], // Array of user IDs

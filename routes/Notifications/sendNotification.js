@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
 
   try {
     const userTokenRecord = await PushNotificationToken.findOne({ userId }).select('token');
-    console.log(userTokenRecord);
+    // console.log(userTokenRecord);
     if (!userTokenRecord) {
       return res.status(404).json({ message: "No token found for this user" });
     }
@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: "Token is missing for this user" });
     }
 
-    console.log(fcmToken);
+    // console.log(fcmToken);
     const message = {
       notification: {
         title,
