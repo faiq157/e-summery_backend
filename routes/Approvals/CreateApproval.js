@@ -27,7 +27,8 @@ router.post("/", async (req, res) => {
       email,
       refNo,
       date,
-      bodyText
+      bodyText,
+      status: "new" 
     });
 
     const savedApproval = await NewApproval.save();
