@@ -6,9 +6,6 @@ const authMiddleware = require("../../middleware/authMiddleware");
 const fs = require("fs");
 const s3 = require("../../config/cloudfareConfig");
 
-const BUCKET_NAME = "notesheets";
-const R2_PUBLIC_URL = "https://pub-df4b0b355e6f47b294e478e797b911da.r2.dev";
-
 // Route for uploading a new approval (existing)
 router.post("/", async (req, res) => {
   const { title,registrarOffice,phoneFax,email,refNo,date,bodyText } = req.body;
