@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const approvalSchema = require("../../models/ApprovalSchema");
-const upload = require("../../config/multerConfig");
 const authMiddleware = require("../../middleware/authMiddleware");
 const fs = require("fs");
-const s3 = require("../../config/cloudfareConfig");
 
 // Route for uploading a new approval (existing)
 router.post("/", async (req, res) => {
