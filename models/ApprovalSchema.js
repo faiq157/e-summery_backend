@@ -43,7 +43,7 @@ const ApprovalSchema = new mongoose.Schema(
     },
     selectedRole:{
       type:String,
-      required:true,
+      required:false,
     },
     sended:{
       type:Boolean,
