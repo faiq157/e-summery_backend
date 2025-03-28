@@ -1,18 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const Notesheet = require("../../models/NotesheetSchema");
-const User = require("../../models/User");
 const upload = require("../../config/multerConfig");
 const authMiddleware = require("../../middleware/authMiddleware");
 const fs = require("fs");
-const { v4: uuidv4 } = require("uuid");
 
-const s3 = require("../../config/cloudfareConfig");
-const BUCKET_NAME = "notesheets";
-
- const R2_PUBLIC_URL = "https://pub-df4b0b355e6f47b294e478e797b911da.r2.dev";
-
- router.post("/:id", authMiddleware, upload.single("document"), async (req, res) => {
+router.post("/:id", authMiddleware, upload.single("document"), async (req, res) => {
   const { id } = req.params;
   const { role, comment } = req.body;
 
@@ -30,35 +23,28 @@ const BUCKET_NAME = "notesheets";
       return res.status(403).json({ message: "You are not authorized to comment on this notesheet." });
     }
 
-    let documentUrl = null;
+    let base64Document = null;
 
     if (req.file) {
       try {
+        // Read the file and convert it to Base64
         const fileContent = fs.readFileSync(req.file.path);
-        const fileName = `notesheets/${Date.now()}_${req.file.originalname}`;
+        base64Document = `data:${req.file.mimetype};base64,${fileContent.toString("base64")}`;
 
-        const params = {
-          Bucket: BUCKET_NAME, // Replace with your R2 bucket name
-          Key: fileName,
-          Body: fileContent,
-          ContentType: req.file.mimetype,
-        };
-
-        await s3.upload(params).promise();
-        documentUrl = `${R2_PUBLIC_URL}/${fileName}`;
-      } catch (uploadError) {
-        console.error("Document upload error:", uploadError);
-        return res.status(500).json({ message: "Failed to upload document.", error: uploadError.message });
+        // Optionally, delete the file after converting to Base64
+        fs.unlinkSync(req.file.path);
+      } catch (conversionError) {
+        console.error("Document conversion error:", conversionError);
+        return res.status(500).json({ message: "Failed to process document.", error: conversionError.message });
       }
     }
-
 
     const roleIndex = notesheet.roles.findIndex((r) => r.role === role);
 
     const commentObject = {
       user: role,
       comment,
-      document: documentUrl || null, // Include document URL if available
+      document: base64Document || null, // Store Base64 document if available
       timestamp: new Date(),
     };
 
@@ -87,4 +73,4 @@ const BUCKET_NAME = "notesheets";
   }
 });
 
-module.exports=router;
+module.exports = router;

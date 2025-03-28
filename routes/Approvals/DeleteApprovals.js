@@ -2,9 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const approvalSchema = require("../../models/ApprovalSchema");
-const s3 = require("../../config/cloudfareConfig");
 
-const BUCKET_NAME = "notesheets";
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
