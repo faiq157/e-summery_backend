@@ -41,6 +41,10 @@ const ApprovalSchema = new mongoose.Schema(
       ref: "User", // Reference to the User model
       default: [], // Default is an empty array
     },
+    selectedRole:{
+      type:String,
+      required:true,
+    },
     sended:{
       type:Boolean,
       default:false,

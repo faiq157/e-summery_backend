@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const approvalSchema = require("../../models/ApprovalSchema");
 router.post("/", async (req, res) => {
-  const { approvalId, userIds } = req.body; // assuming userIds is an array of user IDs
+  const { approvalId, userIds,selectedRole } = req.body; // assuming userIds is an array of user IDs
 
   if (!approvalId || !userIds || userIds.length === 0) {
     return res.status(400).json({ message: "Approval ID and at least one user ID are required." });
@@ -22,6 +22,10 @@ router.post("/", async (req, res) => {
     approval.sentTo = updatedSentTo;
     approval.sended = true;
     approval.status = "received";
+    approval.selectedRole = selectedRole;
+    
+
+
     const updatedApproval = await approval.save();
 
     // Logic to send approval to multiple users (e.g., email or notification)

@@ -24,6 +24,7 @@ router.get("/:id", async (req, res) => {
         sentTo: approval.sentTo,
         sended: approval.sended,
         status: approval.status,
+        selectedRole: approval.selectedRole,
         _id: approval._id,
         createdAt: approval.createdAt,
         updatedAt: approval.updatedAt,
