@@ -16,7 +16,7 @@ app.use(express.json());
 // Set up CORS for REST API
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://e-summery.netlify.app","https://e-summery.onrender.com"],
+    origin: ["http://localhost:5173", "https://e-summery.netlify.app","https://e-summery.onrender.com","https://e-notesheet.netlify.app/"],
      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   })
