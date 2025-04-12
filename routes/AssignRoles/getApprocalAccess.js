@@ -4,13 +4,18 @@ const express = require('express');
 const router = express.Router();
 router.get('/', async (req, res) => {
     try {
-        // Fetch all approval roles
-        const approvalRoles = await ApprovalRole.find();
-        res.status(200).json({ data: approvalRoles });
+        const approvalRoleDoc = await ApprovalRole.findOne();
+
+        if (!approvalRoleDoc) {
+            return res.status(404).json({ message: 'No approval roles found.' });
+        }
+
+        res.status(200).json({ message: 'Approval roles retrieved successfully', data: approvalRoleDoc });
     } catch (error) {
-        console.error('Error fetching approval roles:', error);
-        res.status(500).json({ error: 'Failed to fetch approval roles' });
+        console.error('Error retrieving approval roles:', error);
+        res.status(500).json({ error: 'Failed to retrieve approval roles' });
     }
 });
+
 
 module.exports = router;
