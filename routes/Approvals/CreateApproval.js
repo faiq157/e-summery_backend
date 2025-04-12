@@ -1,21 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const approvalSchema = require("../../models/ApprovalSchema");
-const authMiddleware = require("../../middleware/authMiddleware");
-const fs = require("fs");
+const Approval = require("../../models/ApprovalSchema");
+const { default: mongoose } = require("mongoose");
 
-// Route for uploading a new approval (existing)
+// Route for creating a new approval
 router.post("/", async (req, res) => {
-  const { title,registrarOffice,phoneFax,email,refNo,date,bodyText } = req.body;
+  const { title, registrarOffice, phoneFax, email, refNo, date, bodyText, userId } = req.body;
 
   try {
-    if (!title || !registrarOffice || !phoneFax || !email || !refNo ||!date ||!bodyText) {
-      return res.status(400).json({ message: "All Field are required." });
+    if (!title || !registrarOffice || !phoneFax || !email || !refNo || !date || !bodyText || !userId) {
+      return res.status(400).json({ message: "All fields, including userId, are required." });
     }
 
+    // Validate userId as ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid userId format." });
+    }
 
     // Save to MongoDB
-    const NewApproval = new approvalSchema({
+    const NewApproval = new Approval({
       title,
       registrarOffice,
       phoneFax,
@@ -23,7 +26,9 @@ router.post("/", async (req, res) => {
       refNo,
       date,
       bodyText,
-      status: "new" 
+      status: "new",
+      sentTo: [new mongoose.Types.ObjectId(userId)], // Use 'new' keyword
+      userId: new mongoose.Types.ObjectId(userId), // Save userId as ObjectId
     });
 
     const savedApproval = await NewApproval.save();
@@ -34,8 +39,9 @@ router.post("/", async (req, res) => {
       data: savedApproval,
     });
   } catch (error) {
-    console.error("Error uploading PDF:", error);
-    res.status(500).json({ message: "Failed to upload PDF.", error: error.message });
+    console.error("Error creating approval:", error);
+    res.status(500).json({ message: "Failed to create approval.", error: error.message });
   }
 });
+
 module.exports = router;
