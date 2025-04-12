@@ -6,7 +6,7 @@ const CreateRoute = require("./CreateApproval");
 const DeleteRoute = require("./DeleteApprovals");
 const GetApprovalIdsRoute = require("./GetApprovalIDs");
 const GetApprovalRoute = require("./GetApprovals");
-const GetApprovalUser = require("./GetApprovalUser");
+
 const SendApproval = require("./SendApproval");
 const SendApprovalOther = require("./SendApprovalOthers");
 const UpdateApprovalStatus = require("./UpdateApprovalStatus");
@@ -17,8 +17,7 @@ const GetApprovalComments = require("./GetapprovalComments");
 router.use("/approval", CreateRoute);
 router.use("/approval", DeleteRoute);
 router.use("/approvals", GetApprovalIdsRoute);
-router.use("/approvals", GetApprovalRoute);
-router.use("/approvals/user", GetApprovalUser);
+router.use("/approvals/user", GetApprovalRoute);
 router.use("/approval/send", SendApproval);
 router.use("/approval/send-other", SendApprovalOther);
 router.use("/approval", UpdateApprovalStatus);
