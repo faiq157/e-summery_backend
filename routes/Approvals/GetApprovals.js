@@ -10,11 +10,6 @@ router.get("/:userId", async (req, res) => {
   try {
     // Find approvals where userId matches
     const approvals = await approvalSchema.find({ userId });
-
-    if (!approvals || approvals.length === 0) {
-      return res.status(404).json({ message: "No notesheets found for this user." });
-    }
-
     res.status(200).json({ data: approvals });
   } catch (error) {
     console.error("Error fetching notesheets:", error);
