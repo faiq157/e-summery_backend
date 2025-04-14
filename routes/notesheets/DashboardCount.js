@@ -3,8 +3,9 @@ const router = express.Router();
 const Notesheet = require("../../models/NotesheetSchema");
 
 const moment = require("moment"); // Include moment.js for date manipulation
+const authMiddleware = require("../../middleware/authMiddleware");
 
-router.get("/", async (req, res) => {
+router.get("/",authMiddleware, async (req, res) => {
   try {
     const { role } = req.query; // Corrected: Use req.query instead of req.params
     const { filter } = req.query; // Filter query parameter to specify weekly, 15 days, or monthly

@@ -1,9 +1,13 @@
 const mongoose = require("mongoose");
 
-const commentSchema = new mongoose.Schema({
-  text: { type: String, required: true },
-  date: { type: Date, default: Date.now },
-});
+// Comment sub-schema
+const commentSchema = new mongoose.Schema(
+  {
+    text: { type: String, required: true },
+    date: { type: Date, default: Date.now },
+  },
+  { _id: false } // Avoids unnecessary _id field for each comment
+);
 
 const ApprovalSchema = new mongoose.Schema(
   {
@@ -13,47 +17,43 @@ const ApprovalSchema = new mongoose.Schema(
     },
     registrarOffice: {
       type: String,
-      required: false,
     },
     phoneFax: {
       type: String,
-      required: false,
     },
     email: {
       type: String,
-      required: false,
     },
     refNo: {
       type: String,
-      required: false,
     },
     date: {
-      type: String,
-      required: false,
+      type: String, // Keep this as String if it’s not an actual Date
     },
     bodyText: {
       type: String,
-      required: false,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId, // Changed to ObjectId
-      ref: "User", // Reference to the User model
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
-    comments: [commentSchema],
+    comments: {
+      type: [commentSchema],
+      default: [],
+    },
     status: {
       type: String,
       enum: ["new", "received", "completed"],
       default: "new",
     },
     sentTo: {
-      type: [mongoose.Schema.Types.ObjectId], // Array of ObjectIds
-      ref: "User", // Reference to the User model
-      default: [], // Default is an empty array
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "User",
+      default: [],
     },
     selectedRole: {
       type: String,
-      required: false,
     },
     sended: {
       type: Boolean,
@@ -65,7 +65,7 @@ const ApprovalSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Adds updatedAt in addition to createdAt
   }
 );
 
