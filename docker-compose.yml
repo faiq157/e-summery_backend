@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6.0
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: e-summeryDB
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./e-summery_backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    env_file:
+        - ./e-summery_backend/.env.docker
+
+  frontend:
+    build: ./e-summery_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    env_file:
+      - ./e-summery_frontend/.env
+
+volumes:
+  mongo-data:
+
