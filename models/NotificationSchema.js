@@ -32,6 +32,13 @@ const NotificationSchema = new mongoose.Schema({
   }
 });
 
+// Add indexes for common query patterns
+NotificationSchema.index({ userId: 1 }); // Query by user ID
+NotificationSchema.index({ userId: 1, isRead: 1 }); // Compound index for user + read status
+NotificationSchema.index({ sentAt: -1 }); // Sort by sent date (descending)
+NotificationSchema.index({ status: 1 }); // Query by notification status
+NotificationSchema.index({ userId: 1, sentAt: -1 }); // Compound index for user + date
+
 const Notification = mongoose.model('Notification', NotificationSchema);
 
 module.exports = Notification;

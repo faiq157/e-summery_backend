@@ -13,6 +13,10 @@ const approvalRoleSchema = new mongoose.Schema({
     },
 });
 
+// Add indexes for common query patterns
+approvalRoleSchema.index({ approvalAccess: 1 }); // Query by approval access roles
+approvalRoleSchema.index({ createdAt: -1 }); // Sort by creation date (descending)
+
 // Create the model from the schema
 const ApprovalRole = mongoose.model('ApprovalRole', approvalRoleSchema);
 

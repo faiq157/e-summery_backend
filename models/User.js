@@ -14,4 +14,11 @@ const UserSchema = new mongoose.Schema({
   // otpExpiry: { type: Date },
 },{ timestamps: true });
 
+// Add indexes for common query patterns
+UserSchema.index({ email: 1 }, { unique: true }); // Email is unique and frequently queried
+UserSchema.index({ role: 1 }); // Query by role
+UserSchema.index({ department: 1 }); // Query by department
+UserSchema.index({ role: 1, department: 1 }); // Compound index for role + department queries
+UserSchema.index({ resetPasswordToken: 1 }); // For password reset functionality
+
 module.exports = mongoose.model("User", UserSchema);
