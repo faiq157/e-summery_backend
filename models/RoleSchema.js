@@ -27,6 +27,11 @@ const roleSchema = new mongoose.Schema({
     selectedRole: [selectedRoleSchema], 
 });
 
+// Add indexes for common query patterns
+roleSchema.index({ role: 1 }); // Query by role name
+roleSchema.index({ "selectedRole.email": 1 }); // Query by email within selectedRole
+roleSchema.index({ "selectedRole.id": 1 }); // Query by id within selectedRole
+
 // Create the model from the schema
 const Role = mongoose.model('Role', roleSchema);
 

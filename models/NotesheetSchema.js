@@ -50,4 +50,14 @@ const notesheetSchema = new mongoose.Schema({
   ],
 });
 
+// Add indexes for common query patterns
+notesheetSchema.index({ trackingId: 1 }, { unique: true }); // Unique tracking ID
+notesheetSchema.index({ "workflow.role": 1, "workflow.status": 1 }); // Compound index for workflow queries
+notesheetSchema.index({ "timestamps.createdAt": -1 }); // Sort by creation date (descending)
+notesheetSchema.index({ currentHandler: 1 }); // Query by current handler
+notesheetSchema.index({ email: 1 }); // Query by user email
+notesheetSchema.index({ subject: "text", userName: "text" }); // Text search on subject and userName
+notesheetSchema.index({ "workflow.role": 1, "timestamps.createdAt": -1 }); // Role + date compound index
+notesheetSchema.index({ "history.role": 1, "history.timeliness": 1 }); // For timeliness queries
+
 module.exports = mongoose.model("Notesheet", notesheetSchema);

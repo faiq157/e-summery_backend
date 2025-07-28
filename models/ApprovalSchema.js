@@ -28,7 +28,7 @@ const ApprovalSchema = new mongoose.Schema(
       type: String,
     },
     date: {
-      type: String, // Keep this as String if it’s not an actual Date
+      type: String, // Keep this as String if it's not an actual Date
     },
     bodyText: {
       type: String,
@@ -68,5 +68,15 @@ const ApprovalSchema = new mongoose.Schema(
     timestamps: true, // Adds updatedAt in addition to createdAt
   }
 );
+
+// Add indexes for common query patterns
+ApprovalSchema.index({ userId: 1 }); // Query by user who created the approval
+ApprovalSchema.index({ sentTo: 1 }); // Query by users the approval was sent to
+ApprovalSchema.index({ status: 1 }); // Query by approval status
+ApprovalSchema.index({ createdAt: -1 }); // Sort by creation date (descending)
+ApprovalSchema.index({ userId: 1, status: 1 }); // Compound index for user + status
+ApprovalSchema.index({ sentTo: 1, status: 1 }); // Compound index for sentTo + status
+ApprovalSchema.index({ selectedRole: 1 }); // Query by selected role
+ApprovalSchema.index({ sended: 1 }); // Query by sent status
 
 module.exports = mongoose.model("Approval", ApprovalSchema);
